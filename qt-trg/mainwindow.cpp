@@ -11,8 +11,10 @@
 #include <string>
 #include <fstream>
 #include <streambuf>
+#include <QMessageBox>
 
 QListWidget* dataList = nullptr;
+QPushButton* btnGenerate = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     resize(WIDTH, HEIGHT);
-    this->setWindowTitle("Trustless Random Generator");
+    this->setWindowTitle(tr("Trustless Random Generator"));
     QDesktopWidget* desktop = QApplication::desktop();
     this->move(desktop->width()/2 - WIDTH/2, desktop->height()/2 - HEIGHT/2);
 
@@ -39,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     gridLayout->setGeometry(layoutGeometry);
 
     QLabel* lblBlockchains = new QLabel(this);
-    lblBlockchains->setText("Blockchains : ");
+    lblBlockchains->setText("Blockchain : ");
 
     QComboBox* cboBlockchains = new QComboBox(this);
     QStringList qBlockchainsList = (QStringList() << "BTC" << "ETH" << "LTC");
@@ -51,8 +53,27 @@ MainWindow::MainWindow(QWidget *parent) :
     dataList = new QListWidget(this);
     gridLayout->addWidget(dataList, 1, 0, 4, 4);
 
-    QPushButton* btnGenerate = new QPushButton(this);
+
+    QLabel* lblHashUsed = new QLabel(this);
+    lblHashUsed->setText(tr("Hash used : "));
+    gridLayout->addWidget(lblHashUsed, 1, 5, 1, 4);
+
+    QLabel* lblBlockchainUsed = new QLabel(this);
+    lblBlockchainUsed->setText(tr("Blockchain used : "));
+    gridLayout->addWidget(lblBlockchainUsed, 2, 5, 1, 4);
+
+    QLabel* lblTimestampHash = new QLabel(this);
+    lblTimestampHash->setText(tr("Hash timestamp : "));
+    gridLayout->addWidget(lblTimestampHash, 3, 5, 1, 4);
+
+    QLabel* lblResult = new QLabel(this);
+    lblResult->setText(tr("Result : "));
+    gridLayout->addWidget(lblResult, 4, 5, 1, 4);
+
+    btnGenerate = new QPushButton(this);
     btnGenerate->setText("Generate");
+    btnGenerate->setEnabled(false);
+    connect(btnGenerate, SIGNAL(clicked()), this, SLOT(generate()));
     gridLayout->addWidget(btnGenerate, 5, 0, 1, 1);
 }
 
@@ -66,6 +87,12 @@ void MainWindow::import()
     QString qData(data.c_str());
     QRegExp rx("(\\,)");
     dataList->addItems(qData.split(rx));
+    btnGenerate->setEnabled(dataList->count() > 1);
+}
+
+void MainWindow::generate()
+{
+
 }
 
 MainWindow::~MainWindow()

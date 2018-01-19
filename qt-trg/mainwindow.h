@@ -18,6 +18,7 @@ public:
 
 public slots:
     void import();
+    void generate();
 private:
     Ui::MainWindow *ui;
 };
