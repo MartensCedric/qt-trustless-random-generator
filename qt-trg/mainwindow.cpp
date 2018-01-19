@@ -1,10 +1,18 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QFileDialog>
+#include <QListWidget>
+#include <QPushButton>
 #include <qcombobox.h>
 #include <qdesktopwidget.h>
 #include <qgridlayout.h>
 #include <qlabel.h>
+#include <string>
+#include <fstream>
+#include <streambuf>
+
+QListWidget* dataList = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     menuFile->addAction(actionImportFile);
     menuFile->addAction(actionQuit);
 
+    connect(actionImportFile, SIGNAL(triggered()), this, SLOT(import()));
     connect(actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
     QGridLayout* gridLayout = new QGridLayout(centralWidget());
@@ -38,6 +47,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     gridLayout->addWidget(lblBlockchains, 0, 0, 1, 1);
     gridLayout->addWidget(cboBlockchains, 0, 1, 1, 1);
+
+    dataList = new QListWidget(this);
+    gridLayout->addWidget(dataList, 1, 0, 4, 4);
+
+    QPushButton* btnGenerate = new QPushButton(this);
+    btnGenerate->setText("Generate");
+    gridLayout->addWidget(btnGenerate, 5, 0, 1, 1);
+}
+
+void MainWindow::import()
+{
+    dataList->clear();
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),".",tr("CSV Files (*.csv)"));
+    std::ifstream f(fileName.toStdString());
+    std::string data((std::istreambuf_iterator<char>(f)),
+                     std::istreambuf_iterator<char>());
+    QString qData(data.c_str());
+    QRegExp rx("(\\,)");
+    dataList->addItems(qData.split(rx));
 }
 
 MainWindow::~MainWindow()

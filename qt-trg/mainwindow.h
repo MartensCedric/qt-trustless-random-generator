@@ -16,6 +16,8 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+public slots:
+    void import();
 private:
     Ui::MainWindow *ui;
 };
