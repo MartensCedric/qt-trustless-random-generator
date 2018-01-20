@@ -18,6 +18,7 @@
 #include <jsoncpp/json/value.h>
 #include <boost/functional/hash.hpp>
 #include "web.h"
+#include <QClipboard>
 #include <QLineEdit>
 #include <qdesktopservices.h>
 #include <stdlib.h>
@@ -30,6 +31,7 @@ QLineEdit* leHash = nullptr;
 QLineEdit* leTimestamp = nullptr;
 QLineEdit* leResult = nullptr;
 QPushButton* btnBrowse = nullptr;
+QPushButton* btnCopy = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -66,51 +68,61 @@ MainWindow::MainWindow(QWidget *parent) :
     gridLayout->addWidget(cboBlockchains, 0, 1, 1, 1);
 
     dataList = new QListWidget(this);
-    gridLayout->addWidget(dataList, 1, 0, 8, 8);
-
-    QLabel* lblBlockchainUsed = new QLabel(this);
-    lblBlockchainUsed->setText(tr("Blockchain used : "));
-    gridLayout->addWidget(lblBlockchainUsed, 1, 9, 1, 1);
-
-    leBlockchain = new QLineEdit(this);
-    leBlockchain->setEnabled(false);
-    gridLayout->addWidget(leBlockchain, 1, 10, 1, 1);
-
-    QLabel* lblHashUsed = new QLabel(this);
-    lblHashUsed->setText(tr("Hash used : "));
-    gridLayout->addWidget(lblHashUsed, 2, 9, 1, 1);
-
-    leHash = new QLineEdit(this);
-    leHash->setEnabled(false);
-    gridLayout->addWidget(leHash, 2, 10, 1, 1);
-
-    QLabel* lblTimestampHash = new QLabel(this);
-    lblTimestampHash->setText(tr("Hash timestamp : "));
-    gridLayout->addWidget(lblTimestampHash, 3, 9, 1, 1);
-
-    leTimestamp = new QLineEdit(this);
-    leTimestamp->setEnabled(false);
-    gridLayout->addWidget(leTimestamp, 3, 10, 1, 1);
-
-    QLabel* lblResult = new QLabel(this);
-    lblResult->setText(tr("Result : "));
-    gridLayout->addWidget(lblResult, 4, 9, 1, 1);
-
-    leResult = new QLineEdit(this);
-    leResult->setEnabled(false);
-    gridLayout->addWidget(leResult, 4, 10, 1, 1);
-
-    btnBrowse = new QPushButton(this);
-    btnBrowse->setText(tr("Browse on explorer"));
-    btnBrowse->setEnabled(false);
-    gridLayout->addWidget(btnBrowse, 5, 9, 1, 2);
-    connect(btnBrowse, SIGNAL(clicked()), this, SLOT(browse()));
+    gridLayout->addWidget(dataList, 1, 0, 4, 4);
 
     btnGenerate = new QPushButton(this);
     btnGenerate->setText("Generate");
     btnGenerate->setEnabled(false);
     connect(btnGenerate, SIGNAL(clicked()), this, SLOT(generate()));
-    gridLayout->addWidget(btnGenerate, 10, 0, 1, 8);
+    gridLayout->addWidget(btnGenerate, 5, 0, 1, 2);
+
+    QLabel* lblBlockchainUsed = new QLabel(this);
+    lblBlockchainUsed->setText(tr("Blockchain used : "));
+    gridLayout->addWidget(lblBlockchainUsed, 6, 0, 1, 1);
+
+    leBlockchain = new QLineEdit(this);
+    leBlockchain->setEnabled(false);
+    leBlockchain->setStyleSheet("QLineEdit {color:black}");
+    gridLayout->addWidget(leBlockchain, 6, 1, 1, 1);
+
+    QLabel* lblHashUsed = new QLabel(this);
+    lblHashUsed->setText(tr("Hash used : "));
+    gridLayout->addWidget(lblHashUsed, 7, 0, 1, 1);
+
+    leHash = new QLineEdit(this);
+    leHash->setEnabled(false);
+    leHash->setStyleSheet("QLineEdit {color:black}");
+    gridLayout->addWidget(leHash, 7, 1, 1, 1);
+
+    QLabel* lblTimestampHash = new QLabel(this);
+    lblTimestampHash->setText(tr("Hash timestamp : "));
+    gridLayout->addWidget(lblTimestampHash, 8, 0, 1, 1);
+
+    leTimestamp = new QLineEdit(this);
+    leTimestamp->setEnabled(false);
+    leTimestamp->setStyleSheet("QLineEdit {color:black}");
+    gridLayout->addWidget(leTimestamp, 8, 1, 1, 1);
+
+    QLabel* lblResult = new QLabel(this);
+    lblResult->setText(tr("Result : "));
+    gridLayout->addWidget(lblResult, 9, 0, 1, 1);
+
+    leResult = new QLineEdit(this);
+    leResult->setEnabled(false);
+    leResult->setStyleSheet("QLineEdit {color:black}");
+    gridLayout->addWidget(leResult, 9, 1, 1, 1);
+
+    btnBrowse = new QPushButton(this);
+    btnBrowse->setText(tr("Browse on explorer"));
+    btnBrowse->setEnabled(false);
+    gridLayout->addWidget(btnBrowse, 10, 0, 1, 2);
+    connect(btnBrowse, SIGNAL(clicked()), this, SLOT(browse()));
+
+    btnCopy = new QPushButton(this);
+    btnCopy->setText(tr("Copy hash to clipboard"));
+    btnCopy->setEnabled(false);
+    gridLayout->addWidget(btnCopy, 11, 0, 1, 2);
+    connect(btnCopy, SIGNAL(clicked()), this, SLOT(copyHash()));
 }
 
 void MainWindow::import()
@@ -145,6 +157,7 @@ void MainWindow::generate()
     leTimestamp->setText(QString(timestamp.c_str()));
     leResult->setText(dataList->item(resIndex)->text());
     btnBrowse->setEnabled(true);
+    btnCopy->setEnabled(true);
 }
 
 void MainWindow::browse()
@@ -152,9 +165,18 @@ void MainWindow::browse()
     QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + cboBlockchains->currentText().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
 }
 
+void MainWindow::copyHash()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    clipboard->setText(leHash->text());
+}
+
 MainWindow::~MainWindow()
 {
+    delete btnCopy;
     delete btnBrowse;
+    delete leTimestamp;
+    delete leResult;
     delete leBlockchain;
     delete leHash;
     delete cboBlockchains;
