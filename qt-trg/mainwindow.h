@@ -19,6 +19,7 @@ public:
 public slots:
     void import();
     void generate();
+    void browse();
 private:
     Ui::MainWindow *ui;
 };

@@ -2,6 +2,8 @@
 #include <curl/curl.h>
 #include <string>
 #include <iostream>
+#include <QDesktopServices>
+#include <QUrl>
 #include <jsoncpp/json/json.h>
 #include <jsoncpp/json/reader.h>
 #include <jsoncpp/json/writer.h>

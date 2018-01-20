@@ -18,11 +18,16 @@
 #include <jsoncpp/json/value.h>
 #include <boost/functional/hash.hpp>
 #include "web.h"
+#include <QLineEdit>
+#include <qdesktopservices.h>
 #include <stdlib.h>
 
 QListWidget* dataList = nullptr;
 QPushButton* btnGenerate = nullptr;
 QComboBox* cboBlockchains = nullptr;
+QLineEdit* leBlockchain = nullptr;
+QLineEdit* leHash = nullptr;
+QPushButton* btnBrowse = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -61,22 +66,35 @@ MainWindow::MainWindow(QWidget *parent) :
     dataList = new QListWidget(this);
     gridLayout->addWidget(dataList, 1, 0, 4, 4);
 
+    QLabel* lblBlockchainUsed = new QLabel(this);
+    lblBlockchainUsed->setText(tr("Blockchain used : "));
+    gridLayout->addWidget(lblBlockchainUsed, 1, 5, 1, 3);
+
+    leBlockchain = new QLineEdit(this);
+    leBlockchain->setEnabled(false);
+    gridLayout->addWidget(leBlockchain, 1, 9, 1, 2);
 
     QLabel* lblHashUsed = new QLabel(this);
     lblHashUsed->setText(tr("Hash used : "));
-    gridLayout->addWidget(lblHashUsed, 1, 5, 1, 4);
+    gridLayout->addWidget(lblHashUsed, 2, 5, 1, 2);
 
-    QLabel* lblBlockchainUsed = new QLabel(this);
-    lblBlockchainUsed->setText(tr("Blockchain used : "));
-    gridLayout->addWidget(lblBlockchainUsed, 2, 5, 1, 4);
+    leHash = new QLineEdit(this);
+    leHash->setEnabled(false);
+    gridLayout->addWidget(leHash, 2, 9, 1, 4);
+
+    btnBrowse = new QPushButton(this);
+    btnBrowse->setText(tr("Browse on explorer"));
+    btnBrowse->setEnabled(false);
+    gridLayout->addWidget(btnBrowse, 3, 9, 1, 5);
+    connect(btnBrowse, SIGNAL(clicked()), this, SLOT(browse()));
 
     QLabel* lblTimestampHash = new QLabel(this);
     lblTimestampHash->setText(tr("Hash timestamp : "));
-    gridLayout->addWidget(lblTimestampHash, 3, 5, 1, 4);
+    gridLayout->addWidget(lblTimestampHash, 4, 5, 1, 4);
 
     QLabel* lblResult = new QLabel(this);
     lblResult->setText(tr("Result : "));
-    gridLayout->addWidget(lblResult, 4, 5, 1, 4);
+    gridLayout->addWidget(lblResult, 5, 5, 1, 4);
 
     btnGenerate = new QPushButton(this);
     btnGenerate->setText("Generate");
@@ -95,7 +113,7 @@ void MainWindow::import()
     QString qData(data.c_str());
     QRegExp rx("(\\,)");
     dataList->addItems(qData.split(rx));
-    btnGenerate->setEnabled(dataList->count() > 1);
+    btnGenerate->setEnabled(dataList->count() > 1);    
 }
 
 void MainWindow::generate()
@@ -104,9 +122,6 @@ void MainWindow::generate()
 
     std::string hash = root.get("hash", "").asString();
     std::string timestamp = root.get("time", "").asString();
-
-    std::cout << "Hash used : " << hash << std::endl;
-    std::cout << "Hash time : " << timestamp << std::endl;
 
     boost::hash<std::string> string_hash;
 
@@ -117,10 +132,21 @@ void MainWindow::generate()
     int resIndex = rand() % dataList->count();
     std::cout << "Result : " << dataList->item(resIndex)->text().toStdString() << std::endl;
     dataList->setCurrentRow(resIndex);
+    leBlockchain->setText(cboBlockchains->currentText());
+    leHash->setText(QString(hash.c_str()));
+    btnBrowse->setEnabled(true);
+}
+
+void MainWindow::browse()
+{
+    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + cboBlockchains->currentText().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
 }
 
 MainWindow::~MainWindow()
 {
+    delete btnBrowse;
+    delete leBlockchain;
+    delete leHash;
     delete cboBlockchains;
     delete dataList;
     delete btnGenerate;

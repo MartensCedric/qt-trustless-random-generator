@@ -14,6 +14,7 @@ public:
     Web();
     size_t static write_to_string(void* ptr, size_t size, size_t count, void* stream);
     Json::Value static getJsonFromAPI(const char* url);
+
 };
 
 #endif // WEB_H
