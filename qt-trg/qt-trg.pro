@@ -25,10 +25,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    web.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    web.h
 
 FORMS += \
         mainwindow.ui
+
+LIBS += -lcurl -ljsoncpp -lboost_system

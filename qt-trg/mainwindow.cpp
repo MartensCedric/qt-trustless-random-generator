@@ -12,9 +12,17 @@
 #include <fstream>
 #include <streambuf>
 #include <QMessageBox>
+#include <jsoncpp/json/json.h>
+#include <jsoncpp/json/reader.h>
+#include <jsoncpp/json/writer.h>
+#include <jsoncpp/json/value.h>
+#include <boost/functional/hash.hpp>
+#include "web.h"
+#include <stdlib.h>
 
 QListWidget* dataList = nullptr;
 QPushButton* btnGenerate = nullptr;
+QComboBox* cboBlockchains = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QLabel* lblBlockchains = new QLabel(this);
     lblBlockchains->setText("Blockchain : ");
 
-    QComboBox* cboBlockchains = new QComboBox(this);
+    cboBlockchains = new QComboBox(this);
     QStringList qBlockchainsList = (QStringList() << "BTC" << "ETH" << "LTC");
     cboBlockchains->addItems(qBlockchainsList);
 
@@ -92,10 +100,29 @@ void MainWindow::import()
 
 void MainWindow::generate()
 {
+    Json::Value root = Web::getJsonFromAPI(("https://api.blockcypher.com/v1/" + cboBlockchains->currentText().toLower().toStdString() + "/main").c_str());
 
+    std::string hash = root.get("hash", "").asString();
+    std::string timestamp = root.get("time", "").asString();
+
+    std::cout << "Hash used : " << hash << std::endl;
+    std::cout << "Hash time : " << timestamp << std::endl;
+
+    boost::hash<std::string> string_hash;
+
+    int seed = string_hash(hash);
+
+    std::cout << seed << std::endl;
+    srand(seed);
+    int resIndex = rand() % dataList->count();
+    std::cout << "Result : " << dataList->item(resIndex)->text().toStdString() << std::endl;
+    dataList->setCurrentRow(resIndex);
 }
 
 MainWindow::~MainWindow()
 {
+    delete cboBlockchains;
+    delete dataList;
+    delete btnGenerate;
     delete ui;
 }
