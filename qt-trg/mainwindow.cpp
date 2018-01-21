@@ -21,6 +21,8 @@
 #include "web.h"
 #include <QClipboard>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QMessageBox>
 #include <qdesktopservices.h>
 #include <stdlib.h>
 
@@ -133,7 +135,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(btnCopy, SIGNAL(clicked()), this, SLOT(copyHash()));
 
     verifyWindow = new VerifyWindow(this);
-    connect(verifyWindow, SIGNAL(verify()), this, SLOT(updateVerify(const QString& hash)));
+    connect(verifyWindow, SIGNAL(verify()), this, SLOT(updateVerify()));
 }
 
 void MainWindow::import()
@@ -156,7 +158,11 @@ void MainWindow::generate()
 
     std::string hash = root.get("hash", "").asString();
     std::string timestamp = root.get("time", "").asString();
+    generateResult(hash, timestamp);
+}
 
+void MainWindow::generateResult(std::string& hash, std::string& timestamp)
+{
     boost::hash<std::string> string_hash;
 
     int seed = string_hash(hash);
@@ -188,9 +194,18 @@ void MainWindow::verifyHash() const
     verifyWindow->show();
 }
 
-void MainWindow::updateVerify() const
+void MainWindow::updateVerify()
 {
-    std::cout << "sure" << std::endl;
+    verifyWindow->hide();
+    std::string blockHash = verifyWindow->hash->toStdString();
+    Json::Value root = Web::getJsonFromAPI(("https://api.blockcypher.com/v1/" + verifyWindow->blockchain->toLower().toStdString() +"/main/blocks/" + blockHash).c_str());
+    if(root.get("error", "success").asString().compare("success") == 0)
+    {
+        std::string timestamp = root.get("time", "").asString();
+        this->generateResult(blockHash, timestamp);
+    }else{
+        QMessageBox::warning(const_cast<MainWindow*>(this), tr("Block not found"), tr("Could not find block hash!"));
+    }
 }
 
 MainWindow::~MainWindow()

@@ -14,6 +14,7 @@ class MainWindow : public QMainWindow
     const int HEIGHT = 600;
 public:
     explicit MainWindow(QWidget *parent = 0);
+    void generateResult(std::string& hash, std::string& timestamp);
     ~MainWindow();
 
 public slots:
@@ -22,7 +23,7 @@ public slots:
     void browse() const;
     void copyHash() const;
     void verifyHash() const;
-    void updateVerify() const;
+    void updateVerify();
 private:
     Ui::MainWindow *ui;
 };
