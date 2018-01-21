@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "verifywindow.h"
 
 #include <QFileDialog>
 #include <QListWidget>
@@ -32,6 +33,8 @@ QLineEdit* leTimestamp = nullptr;
 QLineEdit* leResult = nullptr;
 QPushButton* btnBrowse = nullptr;
 QPushButton* btnCopy = nullptr;
+QAction* actionVerifyHash = nullptr;
+VerifyWindow* verifyWindow = nullptr;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -45,12 +48,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QMenu* menuFile = menuBar()->addMenu("&File");
     QAction* actionQuit = new QAction("&Quit");
-    QAction* actionImportFile = new QAction("&Import .csv");
+    actionVerifyHash = new QAction("&Verify hash");
+    QAction* actionImportFile = new QAction("&Import .csv");   
 
     menuFile->addAction(actionImportFile);
+    menuFile->addAction(actionVerifyHash);
     menuFile->addAction(actionQuit);
 
+    actionVerifyHash->setEnabled(false);
+
     connect(actionImportFile, SIGNAL(triggered()), this, SLOT(import()));
+    connect(actionVerifyHash, SIGNAL(triggered()), this, SLOT(verifyHash()));
     connect(actionQuit, SIGNAL(triggered()), this, SLOT(close()));
 
     QGridLayout* gridLayout = new QGridLayout(centralWidget());
@@ -123,6 +131,9 @@ MainWindow::MainWindow(QWidget *parent) :
     btnCopy->setEnabled(false);
     gridLayout->addWidget(btnCopy, 11, 0, 1, 2);
     connect(btnCopy, SIGNAL(clicked()), this, SLOT(copyHash()));
+
+    verifyWindow = new VerifyWindow(this);
+    verifyWindow->resize(WIDTH, HEIGHT/2);
 }
 
 void MainWindow::import()
@@ -135,7 +146,8 @@ void MainWindow::import()
     QString qData(data.c_str());
     QRegExp rx("(\\,)");
     dataList->addItems(qData.split(rx));
-    btnGenerate->setEnabled(dataList->count() > 1);    
+    btnGenerate->setEnabled(dataList->count() > 1);
+    actionVerifyHash->setEnabled(dataList->count() > 1);
 }
 
 void MainWindow::generate()
@@ -153,26 +165,34 @@ void MainWindow::generate()
 
     dataList->setCurrentRow(resIndex);
     leBlockchain->setText(cboBlockchains->currentText());
-    leHash->setText(QString(hash.c_str()));
+    leHash->setText(QString(("..." + hash.substr(hash.length() - 28, std::string::npos)).c_str()));
+    leHash->setProperty("full_hash", QVariant(QString(hash.c_str())));
     leTimestamp->setText(QString(timestamp.c_str()));
     leResult->setText(dataList->item(resIndex)->text());
     btnBrowse->setEnabled(true);
     btnCopy->setEnabled(true);
 }
 
-void MainWindow::browse()
+void MainWindow::browse() const
 {
-    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + cboBlockchains->currentText().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
+    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + leHash->property("full_hash").toString().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
 }
 
-void MainWindow::copyHash()
+void MainWindow::copyHash() const
 {
-    QClipboard *clipboard = QApplication::clipboard();
+    QClipboard *clipboard = QApplication::clipboard();    
     clipboard->setText(leHash->text());
+}
+
+void MainWindow::verifyHash() const
+{
+    verifyWindow->show();
 }
 
 MainWindow::~MainWindow()
 {
+    delete verifyWindow;
+    delete actionVerifyHash;
     delete btnCopy;
     delete btnBrowse;
     delete leTimestamp;

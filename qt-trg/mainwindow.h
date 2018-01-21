@@ -19,8 +19,9 @@ public:
 public slots:
     void import();
     void generate();
-    void browse();
-    void copyHash();
+    void browse() const;
+    void copyHash() const;
+    void verifyHash() const;
 private:
     Ui::MainWindow *ui;
 };
