@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QMenu* menuFile = menuBar()->addMenu("&File");
     QAction* actionQuit = new QAction("&Quit");
-    actionVerifyHash = new QAction("&Verify hash");
+    actionVerifyHash = new QAction("&Verify Results");
     QAction* actionImportFile = new QAction("&Import .csv");   
 
     menuFile->addAction(actionImportFile);
@@ -133,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(btnCopy, SIGNAL(clicked()), this, SLOT(copyHash()));
 
     verifyWindow = new VerifyWindow(this);
-    verifyWindow->resize(WIDTH, HEIGHT/2);
+    connect(verifyWindow, SIGNAL(verify()), this, SLOT(updateVerify(const QString& hash)));
 }
 
 void MainWindow::import()
@@ -165,8 +165,7 @@ void MainWindow::generate()
 
     dataList->setCurrentRow(resIndex);
     leBlockchain->setText(cboBlockchains->currentText());
-    leHash->setText(QString(("..." + hash.substr(hash.length() - 28, std::string::npos)).c_str()));
-    leHash->setProperty("full_hash", QVariant(QString(hash.c_str())));
+    leHash->setText(QString(hash.c_str()));
     leTimestamp->setText(QString(timestamp.c_str()));
     leResult->setText(dataList->item(resIndex)->text());
     btnBrowse->setEnabled(true);
@@ -175,7 +174,7 @@ void MainWindow::generate()
 
 void MainWindow::browse() const
 {
-    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + leHash->property("full_hash").toString().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
+    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + leBlockchain->text().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
 }
 
 void MainWindow::copyHash() const
@@ -187,6 +186,11 @@ void MainWindow::copyHash() const
 void MainWindow::verifyHash() const
 {
     verifyWindow->show();
+}
+
+void MainWindow::updateVerify() const
+{
+    std::cout << "sure" << std::endl;
 }
 
 MainWindow::~MainWindow()

@@ -8,10 +8,17 @@
 class VerifyWindow : public QMainWindow
 {
     Q_OBJECT
+    const int WIDTH = 400;
+    const int HEIGHT = 300;    
 public:
-    explicit VerifyWindow(QWidget *parent = nullptr);
+    explicit VerifyWindow(QWidget *parent = nullptr);        
+    ~VerifyWindow();
 
-signals:
+public slots:
+    void updateButton(QString text) const;
+
+signals:    
+    void verify();
 
 public slots:
 };

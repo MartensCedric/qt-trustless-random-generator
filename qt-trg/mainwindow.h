@@ -10,7 +10,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    const int WIDTH = 400;
+    const int WIDTH = 750;
     const int HEIGHT = 600;
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -22,6 +22,7 @@ public slots:
     void browse() const;
     void copyHash() const;
     void verifyHash() const;
+    void updateVerify() const;
 private:
     Ui::MainWindow *ui;
 };
