@@ -26,18 +26,6 @@
 #include <qdesktopservices.h>
 #include <stdlib.h>
 
-QListWidget* dataList = nullptr;
-QPushButton* btnGenerate = nullptr;
-QComboBox* cboBlockchains = nullptr;
-QLineEdit* leBlockchain = nullptr;
-QLineEdit* leHash = nullptr;
-QLineEdit* leTimestamp = nullptr;
-QLineEdit* leResult = nullptr;
-QPushButton* btnBrowse = nullptr;
-QPushButton* btnCopy = nullptr;
-QAction* actionVerifyHash = nullptr;
-VerifyWindow* verifyWindow = nullptr;
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -71,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lblBlockchains->setText("Blockchain : ");
 
     cboBlockchains = new QComboBox(this);
-    QStringList qBlockchainsList = (QStringList() << "BTC" << "ETH" << "LTC");
+    QStringList qBlockchainsList = (QStringList() << "BTC" << "ETH" << "LTC" << "DASH");
     cboBlockchains->addItems(qBlockchainsList);
 
     gridLayout->addWidget(lblBlockchains, 0, 0, 1, 1);
@@ -158,10 +146,11 @@ void MainWindow::generate()
 
     std::string hash = root.get("hash", "").asString();
     std::string timestamp = root.get("time", "").asString();
-    generateResult(hash, timestamp);
+    QString* blockchainUsed = new QString(cboBlockchains->currentText());
+    generateResult(hash, timestamp, blockchainUsed);
 }
 
-void MainWindow::generateResult(std::string& hash, std::string& timestamp)
+void MainWindow::generateResult(std::string& hash, std::string& timestamp, QString* blockchainUsed)
 {
     boost::hash<std::string> string_hash;
 
@@ -170,7 +159,7 @@ void MainWindow::generateResult(std::string& hash, std::string& timestamp)
     int resIndex = rand() % dataList->count();
 
     dataList->setCurrentRow(resIndex);
-    leBlockchain->setText(cboBlockchains->currentText());
+    leBlockchain->setText(*blockchainUsed);
     leHash->setText(QString(hash.c_str()));
     leTimestamp->setText(QString(timestamp.c_str()));
     leResult->setText(dataList->item(resIndex)->text());
@@ -180,7 +169,7 @@ void MainWindow::generateResult(std::string& hash, std::string& timestamp)
 
 void MainWindow::browse() const
 {
-    QDesktopServices::openUrl(QUrl(QString(("https://live.blockcypher.com/" + leBlockchain->text().toLower().toStdString() + "/block/" + leHash->text().toStdString()).c_str())));
+    QDesktopServices::openUrl(QUrl(QString(("https://api.blockcypher.com/v1/" + leBlockchain->text().toLower().toStdString() + "/main/blocks/" + leHash->text().toStdString()).c_str())));
 }
 
 void MainWindow::copyHash() const
@@ -191,7 +180,7 @@ void MainWindow::copyHash() const
 
 void MainWindow::verifyHash() const
 {
-    verifyWindow->show();
+    verifyWindow->showClear();
 }
 
 void MainWindow::updateVerify()
@@ -202,7 +191,7 @@ void MainWindow::updateVerify()
     if(root.get("error", "success").asString().compare("success") == 0)
     {
         std::string timestamp = root.get("time", "").asString();
-        this->generateResult(blockHash, timestamp);
+        this->generateResult(blockHash, timestamp, verifyWindow->blockchain);
     }else{
         QMessageBox::warning(const_cast<MainWindow*>(this), tr("Block not found"), tr("Could not find block hash!"));
     }

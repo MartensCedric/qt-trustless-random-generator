@@ -7,8 +7,6 @@
 #include <qpushbutton.h>
 #include <QStatusBar>
 
-QPushButton* btnVerify = nullptr;
-
 VerifyWindow::VerifyWindow(QWidget *parent) :
     QMainWindow(parent)
 {
@@ -20,8 +18,8 @@ VerifyWindow::VerifyWindow(QWidget *parent) :
     lblBlockchain->setText(tr("Blockchain : "));
     lblBlockchain->move(20, 20);
 
-    QComboBox* cboBlockchain = new QComboBox(this);
-    cboBlockchain->addItems(QStringList() << "BTC" << "ETH" << "LTC");
+    cboBlockchain = new QComboBox(this);
+    cboBlockchain->addItems(QStringList() << "BTC" << "ETH" << "LTC" << "DASH");
     cboBlockchain->move(100, 20);
     connect(cboBlockchain, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateBlockchain(QString)));
     blockchain = new QString("BTC");
@@ -30,7 +28,7 @@ VerifyWindow::VerifyWindow(QWidget *parent) :
     lblHash->setText(tr("Hash : "));
     lblHash->move(20, 60);
 
-    QLineEdit* leHash = new QLineEdit(this);
+    leHash = new QLineEdit(this);
     leHash->move(70, 60);
     leHash->resize(WIDTH - lblHash->size().width()/2 - 40, leHash->size().height());
 
@@ -44,6 +42,14 @@ VerifyWindow::VerifyWindow(QWidget *parent) :
 
     connect(btnVerify, SIGNAL(clicked()), this, SIGNAL(verify()));
 }
+
+void VerifyWindow::showClear()
+{
+    leHash->clear();
+    cboBlockchain->setCurrentIndex(0);
+    show();
+}
+
 void VerifyWindow::updateButton(QString text)
 {
     btnVerify->setEnabled(text.length() > 0);
