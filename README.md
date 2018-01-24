@@ -1,13 +1,13 @@
 # Trustless Random Generator (TRG)
-TRG removes all necessary trust in random number generation. It is used to remove third parties and keep transparency.
+TRG provides a new way to pick a choice randomly without any cheating possible. It relies on blockchain technology, used by some cryptocurrencies, to generate numbers that are completely random but also verifiable by anyone.
 
 ![Imgur](https://i.imgur.com/egJUQjr.png)
 
 # Use case
-Imagine that Bob is organizing a drawing contest held in a limited timeframe that follows a specific theme. Note that Bob is also participating in the event. He says he will announce a "randomly generated" theme tonight from a public list of possible themes at 8pm which will mark the start of the event. How can you be certain that Bob won't pick the theme of his choice multiple hours before the start of the event and give himself a head start? TRG removes the "Organizer advantage" and the need of a third party to verify the integrity of the results. It ensures that the organizer randomly generates the data at the time he said he would.
+Imagine you are organizing a drawing contest held in a limited timeframe that follows a specific theme. You will also be participating to the event. You will announce a "randomly generated" theme tonight from a list of themes at 8pm which will mark the start of the event. How can the other participants be certain that you did not cheat by picking the theme of your choice? TRG removes the "Organizer advantage" and the need of a third party to verify the integrity of the results by offering a method anyone can verify. It ensures that the organizer randomly generates the data at said time.
 
 # How does it work?
-TRG uses the blockchain's immutability as a solution. The program fetches the most recent block hash that will be used as a seed for the random generation. Users can verify that the used seed was a valid hash at the moment the organizer said he would generate the data. Multiple blockchains are available such as BTC, ETH and LTC, offering different tradeoffs in possible risks.
+TRG uses the blockchain's immutability as a solution. The program fetches the most recent block hash that will be used as a seed for the random generation. Users can verify that the used seed was a valid hash at the moment the organizer said he would generate the data. Multiple blockchains are available such as BTC, ETH and LTC, offering different tradeoffs of possible risks.
 
 # Verifying results
 TRG allows you to verify the results for a specific hash
