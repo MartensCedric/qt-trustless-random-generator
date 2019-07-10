@@ -15,7 +15,7 @@ TRG allows you to verify the results for a specific hash
 
 # Risks and possible malicious actions
 ## Orphaned block (Uncommon, low risk)
-What happens to results coming from an orphaned block? How do you verify the results? While this should be an uncommon situation, the participants doubting the organizer should always immediately verify the hash (preferrably by using TRG, because it will get data from the same node). This ensures that if the current chain is abandonned for another and the block generating the results is lost, the participants will already have verified the organizer's integrity.
+What happens to results coming from an orphaned block? How do you verify the results? While this should be an uncommon situation, the participants doubting the organizer should always immediately verify the hash (preferrably by using TRG, because it will get data from the same node). This ensures that if the current chain is abandoned for another and the block generating the results is lost, the participants will already have verified the organizer's integrity.
 
 ## Malicious actor rejecting a block to alter the results (Very unlikely, high risk)
 A malicious actor that successfuly mines a block at the time the organizer said he would generate the data could reject his block to alter the results. While this is very unlikely, someone that would reject the reward of a block to gain some advantage is likely to have a lot at stake in the event. Unless the event rewards the winner with something much better than a block reward, this should never happen.
